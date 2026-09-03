@@ -19,7 +19,13 @@ analytics, telemetry, or updater configured in the current application code.
 
 ## Screenshots
 
-Screenshots will be added later.
+### Notes
+
+![Flow Notes main window](docs/screenshots/main.png)
+
+### Quick Capture
+
+![Flow Notes Quick Capture](docs/screenshots/quick-capture.png)
 
 ## Privacy
 
