@@ -16,25 +16,25 @@ let reminderEditingId = null;
 let currentView = "all";
 const draftKey = "flow-notes:draft";
 
-const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
+const dateFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "long",
   year: "numeric",
 });
 
-const timeFormatter = new Intl.DateTimeFormat("ru-RU", {
+const timeFormatter = new Intl.DateTimeFormat("en-GB", {
   hour: "2-digit",
   minute: "2-digit",
 });
 
-const reminderFormatter = new Intl.DateTimeFormat("ru-RU", {
+const reminderFormatter = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
   hour: "2-digit",
   minute: "2-digit",
 });
 
-const weekdayFormatter = new Intl.DateTimeFormat("en-US", {
+const weekdayFormatter = new Intl.DateTimeFormat("en-GB", {
   weekday: "long",
 });
 
@@ -200,7 +200,7 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
 
       empty.append(title, subtitle);
     } else {
-      empty.textContent = "Ничего не найдено";
+      empty.textContent = "No notes found";
     }
 
     timeline.append(empty);
@@ -232,8 +232,8 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
     const actions = document.createElement("div");
     actions.className = "note-actions";
 
-    const reminder = createButton("", "icon-button reminder", "Напоминание");
-    reminder.setAttribute("aria-label", "Напоминание");
+    const reminder = createButton("", "icon-button reminder", "Reminder");
+    reminder.setAttribute("aria-label", "Reminder");
     reminder.append(createReminderIcon());
     reminder.classList.toggle("active", Boolean(note.remind_at));
     reminder.addEventListener("click", (event) => {
@@ -242,8 +242,8 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
       toggleReminderPicker(note);
     });
 
-    const favorite = createButton(note.favorite ? "★" : "☆", "icon-button", "Избранное");
-    favorite.setAttribute("aria-label", "Избранное");
+    const favorite = createButton(note.favorite ? "★" : "☆", "icon-button", "Favorite");
+    favorite.setAttribute("aria-label", "Favorite");
     favorite.classList.toggle("active", note.favorite);
     favorite.addEventListener("click", (event) => {
       event.preventDefault();
@@ -251,16 +251,16 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
       toggleFavorite(note);
     });
 
-    const edit = createButton("✎", "icon-button", "Редактировать");
-    edit.setAttribute("aria-label", "Редактировать");
+    const edit = createButton("✎", "icon-button", "Edit");
+    edit.setAttribute("aria-label", "Edit");
     edit.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       startInlineEdit(note);
     });
 
-    const remove = createButton("×", "icon-button danger", "Удалить");
-    remove.setAttribute("aria-label", "Удалить");
+    const remove = createButton("×", "icon-button danger", "Delete");
+    remove.setAttribute("aria-label", "Delete");
     remove.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -370,8 +370,8 @@ function createReminderPicker(note) {
   input.type = "datetime-local";
   input.value = toDatetimeLocalValue(note.remind_at);
 
-  const set = createButton("Set", "reminder-action primary", "Поставить напоминание");
-  const clear = createButton("Clear", "reminder-action", "Удалить напоминание");
+  const set = createButton("Set", "reminder-action primary", "Set reminder");
+  const clear = createButton("Clear", "reminder-action", "Clear reminder");
 
   const presetOptions = [
     { id: "10m", label: "10 min" },
@@ -430,18 +430,7 @@ function createReminderPicker(note) {
 }
 
 function getPlural(count) {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-
-  if (mod10 === 1 && mod100 !== 11) {
-    return "запись";
-  }
-
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
-    return "записи";
-  }
-
-  return "записей";
+  return count === 1 ? "note" : "notes";
 }
 
 function getTauriInvoke() {
@@ -779,7 +768,7 @@ document.addEventListener("keydown", (event) => {
 
 setComposerDraft();
 loadNotes().catch((error) => {
-  timeline.textContent = "Не удалось загрузить заметки";
+  timeline.textContent = "Could not load notes";
   console.error(error);
 });
 
