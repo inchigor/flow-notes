@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Allow Flow Notes windows to listen for backend events",
+  "windows": ["main", "quick-capture"],
+  "permissions": ["core:event:default"]
+}

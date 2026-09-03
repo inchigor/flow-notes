@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Allow Flow Notes windows to listen for backend events","local":true,"windows":["main","quick-capture"],"permissions":["core:event:default"]}}

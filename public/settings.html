@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/settings.css">
+  </head>
+  <body>
+    <main class="settings-window">
+      <header class="settings-header">
+        <h1>Settings</h1>
+      </header>
+
+      <section class="settings-group" aria-label="General">
+        <h2>General</h2>
+
+        <label class="settings-row">
+          <span>Launch at login</span>
+          <input id="launchAtLogin" type="checkbox">
+        </label>
+
+        <fieldset id="launchBehaviorGroup" class="settings-fieldset">
+          <legend>When launched at login</legend>
+          <label class="settings-choice">
+            <input type="radio" name="launchBehavior" value="open">
+            <span>Open main window</span>
+          </label>
+          <label class="settings-choice">
+            <input type="radio" name="launchBehavior" value="background">
+            <span>Start in background</span>
+          </label>
+        </fieldset>
+      </section>
+
+      <section class="settings-group" aria-label="Quick Capture">
+        <h2>Quick Capture</h2>
+
+        <div class="settings-block">
+          <label for="quickCaptureShortcut">Quick Capture shortcut</label>
+          <input
+            id="quickCaptureShortcut"
+            type="text"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="⌘⇧Space"
+            aria-describedby="shortcutHint"
+          >
+          <p id="shortcutHint" class="settings-hint">Shown as symbols. Click to edit the technical shortcut.</p>
+          <div class="settings-actions">
+            <button id="saveShortcut" class="settings-button" type="button">Save shortcut</button>
+            <button id="resetShortcut" class="settings-button" type="button">Reset</button>
+          </div>
+        </div>
+
+        <label class="settings-row">
+          <span>Hide Quick Capture on focus loss</span>
+          <input id="hideQuickCaptureOnBlur" type="checkbox">
+        </label>
+      </section>
+
+      <section class="settings-group" aria-label="Appearance">
+        <h2>Appearance</h2>
+
+        <fieldset class="settings-fieldset">
+          <legend>Note text size</legend>
+          <label class="settings-choice">
+            <input type="radio" name="noteTextSize" value="small">
+            <span>Small</span>
+          </label>
+          <label class="settings-choice">
+            <input type="radio" name="noteTextSize" value="default">
+            <span>Default</span>
+          </label>
+          <label class="settings-choice">
+            <input type="radio" name="noteTextSize" value="large">
+            <span>Large</span>
+          </label>
+        </fieldset>
+      </section>
+
+      <section class="settings-group" aria-label="Backup">
+        <h2>Backup</h2>
+
+        <label class="settings-row">
+          <span>Automatic backups</span>
+          <input id="automaticBackups" type="checkbox">
+        </label>
+
+        <p id="lastBackupLabel" class="settings-meta">Last backup: Never</p>
+
+        <div class="settings-actions">
+          <button id="openBackupFolder" class="settings-button" type="button">Open Backup Folder</button>
+        </div>
+      </section>
+
+      <p id="settingsStatus" class="settings-status" aria-live="polite"></p>
+    </main>
+
+    <script src="/settings.js"></script>
+  </body>
+</html>

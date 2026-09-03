@@ -1,0 +1,17 @@
+{
+  "name": "flow-notes",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "app:icons": "tauri icon src-tauri/icons/icon.png"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.2"
+  }
+}

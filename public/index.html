@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flow Notes</title>
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <button class="sidebar-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">☰</button>
+
+      <aside id="sidebar" class="sidebar">
+        <header class="brand">
+          <h1>Flow Notes</h1>
+          <p id="notesCount">0 записей</p>
+        </header>
+
+        <nav class="sidebar-nav" aria-label="Заметки">
+          <button class="nav-button active" type="button" data-view="all">All Notes</button>
+          <button class="nav-button" type="button" data-view="favorites">Favorites</button>
+        </nav>
+
+        <section class="sidebar-search" aria-label="Search">
+          <label for="searchInput">Search</label>
+          <input id="searchInput" type="search" placeholder="Find notes">
+        </section>
+
+        <section class="backup-section" aria-label="Backup">
+          <h2>Backup</h2>
+          <button id="exportNotes" class="backup-button" type="button">Export Notes</button>
+          <button id="importNotes" class="backup-button" type="button">Import Notes</button>
+          <p id="backupStatus" class="backup-status" aria-live="polite"></p>
+        </section>
+
+        <div class="sidebar-footer">
+          <button id="openSettings" class="sidebar-settings-button" type="button" aria-label="Settings">
+            Settings
+          </button>
+        </div>
+      </aside>
+
+      <section class="stream-panel">
+        <section id="timeline" class="timeline" aria-live="polite"></section>
+
+        <form id="noteForm" class="composer">
+          <textarea id="noteInput" rows="1" placeholder="Write a note..."></textarea>
+        </form>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
