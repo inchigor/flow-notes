@@ -483,6 +483,16 @@ function normalizeNote(note) {
   };
 }
 
+function upsertNote(note) {
+  const index = notes.findIndex((item) => item.id === note.id);
+
+  if (index === -1) {
+    notes.push(note);
+  } else {
+    notes[index] = note;
+  }
+}
+
 function setBackupStatus(message, { error = false } = {}) {
   if (!backupStatus) {
     return;
@@ -592,7 +602,7 @@ async function saveNote(event) {
 
   const created = await createNote(text);
 
-  notes.push(created);
+  upsertNote(created);
   clearDraft();
   setComposerDraft({ restoreDraft: false });
   renderNotes({ scrollMode: "always", smooth: true });
@@ -802,13 +812,7 @@ async function setupNotesChangedListener() {
 
   await listen("notes-changed", (event) => {
     const note = normalizeNote(event.payload);
-    const index = notes.findIndex((item) => item.id === note.id);
-
-    if (index === -1) {
-      notes.push(note);
-    } else {
-      notes[index] = note;
-    }
+    upsertNote(note);
 
     renderNotes({ scrollMode: "if-bottom", smooth: true });
   });
