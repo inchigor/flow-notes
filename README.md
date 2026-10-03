@@ -5,6 +5,21 @@ A local-first notes utility for macOS, built with Tauri.
 Flow Notes keeps notes on the device. It has no account system, cloud sync,
 analytics, telemetry, or updater configured in the current application code.
 
+## Download
+
+Download the latest macOS installer from [GitHub Releases](https://github.com/inchigor/flow-notes/releases/latest).
+The current release is built for Apple Silicon (arm64).
+
+Quit Flow Notes, open the DMG, and drag Flow Notes into Applications. To update,
+replace the existing app. The app identifier and local data location are
+unchanged in version 1.1.0; replacing the app does not require deleting notes
+or settings.
+
+The release is not signed with Apple Developer ID or notarized. macOS may show
+a security warning when opening it for the first time.
+
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
+
 ## Features
 
 - Fast note capture and chronological note stream
@@ -21,11 +36,15 @@ analytics, telemetry, or updater configured in the current application code.
 
 ### Notes
 
-![Flow Notes main window](docs/screenshots/main.png)
+![Flow Notes main window](docs/screenshots/main.jpg)
+
+### Note actions and favorites
+
+![Note actions on hover with a selected favorite](docs/screenshots/note-actions.jpg)
 
 ### Quick Capture
 
-![Flow Notes Quick Capture](docs/screenshots/quick-capture.png)
+![Flow Notes Quick Capture](docs/screenshots/quick-capture.jpg)
 
 ## Privacy
 

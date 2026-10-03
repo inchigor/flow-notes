@@ -1863,6 +1863,61 @@ mod tests {
     }
 
     #[test]
+    fn reopening_existing_database_preserves_notes_and_settings() {
+        let path = std::env::temp_dir().join(format!("flow-notes-upgrade-{}.db", Uuid::new_v4()));
+        let reminder = "2099-05-27T11:00:00.000Z";
+        let shortcut = "CommandOrControl+Shift+Space";
+
+        {
+            let db = Connection::open(&path).expect("db should open");
+            create_schema(&db).expect("schema should create");
+            insert_sample_note(&db, "existing-note", 1);
+            db.execute(
+                "UPDATE notes SET remind_at = ?1 WHERE id = ?2",
+                params![reminder, "existing-note"],
+            )
+            .expect("reminder should save");
+            set_setting(&db, SETTING_NOTE_TEXT_SIZE, "large").expect("text size should save");
+            set_setting(&db, SETTING_QUICK_CAPTURE_SHORTCUT, shortcut)
+                .expect("shortcut should save");
+            set_setting(&db, SETTING_AUTOMATIC_BACKUPS, "1").expect("backup setting should save");
+        }
+
+        {
+            let db = Connection::open(&path).expect("existing db should reopen");
+            create_schema(&db).expect("startup schema check should succeed");
+            let note = select_note(&db, "existing-note")
+                .expect("note should select")
+                .expect("existing note should remain");
+            assert_eq!(note.text, "A calm local note");
+            assert!(note.favorite);
+            assert_eq!(note.remind_at.as_deref(), Some(reminder));
+            assert_eq!(note.created_at, "2026-05-27T10:00:00.000Z");
+            assert_eq!(note.updated_at, "2026-05-27T10:00:00.000Z");
+            assert_eq!(
+                get_setting(&db, SETTING_NOTE_TEXT_SIZE)
+                    .expect("text size should load")
+                    .as_deref(),
+                Some("large")
+            );
+            assert_eq!(
+                get_setting(&db, SETTING_QUICK_CAPTURE_SHORTCUT)
+                    .expect("shortcut should load")
+                    .as_deref(),
+                Some(shortcut)
+            );
+            assert_eq!(
+                get_setting(&db, SETTING_AUTOMATIC_BACKUPS)
+                    .expect("backup setting should load")
+                    .as_deref(),
+                Some("1")
+            );
+        }
+
+        fs::remove_file(path).expect("test database should be removed");
+    }
+
+    #[test]
     fn schema_migrates_existing_notes_without_reminders() {
         let db = Connection::open_in_memory().expect("db should open");
         db.execute_batch(

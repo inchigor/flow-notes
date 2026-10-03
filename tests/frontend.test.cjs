@@ -10,16 +10,30 @@ class Element {
     this.style = {};
     this.dataset = {};
     this.listeners = {};
+    this.children = [];
+    this.attributes = new Map();
+    this.className = "";
     this.scrollHeight = 32;
     this.clientHeight = 32;
     this.scrollTop = 0;
-    this.classList = { toggle() {}, remove() {}, contains() { return false; } };
+    this.classList = {
+      toggle: (name, force) => {
+        const classes = new Set(this.className.split(/\s+/u).filter(Boolean));
+        const enabled = force === undefined ? !classes.has(name) : Boolean(force);
+        if (enabled) classes.add(name);
+        else classes.delete(name);
+        this.className = [...classes].join(" ");
+        return enabled;
+      },
+      remove: (name) => this.classList.toggle(name, false),
+      contains: (name) => this.className.split(/\s+/u).includes(name),
+    };
   }
   addEventListener(name, callback) { this.listeners[name] = callback; }
-  append() {}
-  replaceChildren() {}
-  setAttribute() {}
-  removeAttribute() {}
+  append(...children) { this.children.push(...children); }
+  replaceChildren(...children) { this.children = children; }
+  setAttribute(name, value) { this.attributes.set(name, String(value)); }
+  removeAttribute(name) { this.attributes.delete(name); }
   focus() {}
   setSelectionRange() {}
   scrollTo() {}
@@ -64,7 +78,14 @@ async function load(name) {
   const source = path.join(__dirname, "..", "public", `${name}.js`);
   vm.runInContext(fs.readFileSync(source, "utf8"), context, { filename: source });
   await new Promise((resolve) => setImmediate(resolve));
-  return { elements, calls, rejectSave() { rejectSave = true; } };
+  return {
+    elements,
+    calls,
+    rejectSave() { rejectSave = true; },
+    renderNotes(sampleNotes) {
+      vm.runInContext(`notes = ${JSON.stringify(sampleNotes)}.map(normalizeNote); renderNotes();`, context);
+    },
+  };
 }
 
 for (const name of ["app", "quick-capture"]) {
@@ -122,4 +143,34 @@ test("Quick Capture: only the non-button header starts window dragging", async (
   header.listeners.mousedown({ button: 0, target: { closest: () => ({}) }, preventDefault() {} });
   header.listeners.mousedown({ button: 2, target: { closest: () => null }, preventDefault() {} });
   assert.equal(calls.filter((call) => call.command === "start_quick_capture_drag").length, 1);
+});
+
+test("Favorite button: state and action label distinguish adding from removing", async () => {
+  const harness = await load("app");
+  const now = new Date().toISOString();
+  for (const favorite of [false, true]) {
+    harness.renderNotes([{ id: "sample", text: "A test note", created_at: now, favorite }]);
+    const note = harness.elements.get("#timeline").children.find((item) => item.className === "note");
+    const actions = note.children.find((item) => item.className === "note-actions");
+    const button = actions.children.find((item) => item.classList.contains("favorite"));
+    const title = favorite ? "Remove from favorites" : "Add to favorites";
+    assert.equal(button.title, title);
+    assert.equal(button.attributes.get("aria-label"), title);
+    assert.equal(button.attributes.get("aria-pressed"), String(favorite));
+    assert.equal(button.classList.contains("active"), favorite);
+    assert.equal(harness.elements.get("#favoritesCount").textContent, favorite ? 1 : 0);
+  }
+});
+
+test("Stylesheet: note actions hide by default and reveal on hover, focus, or touch", () => {
+  const style = fs.readFileSync(path.join(__dirname, "..", "public", "style.css"), "utf8");
+  assert.match(style, /\.note-actions\s*\{[^}]*opacity:\s*0;[^}]*pointer-events:\s*none;/u);
+  assert.match(style, /\.note:hover \.note-actions,\s*\.note:focus-within \.note-actions\s*\{[^}]*opacity:\s*1;[^}]*pointer-events:\s*auto;/u);
+  assert.match(style, /@media \(hover: none\), \(pointer: coarse\)\s*\{\s*\.note-actions\s*\{[^}]*opacity:\s*1;[^}]*pointer-events:\s*auto;/u);
+  assert.doesNotMatch(style, /\.note-actions\s*\{[^}]*opacity:\s*0\.8;/u);
+});
+
+test("Stylesheet: selected favorite uses a solid fill", () => {
+  const style = fs.readFileSync(path.join(__dirname, "..", "public", "style.css"), "utf8");
+  assert.match(style, /\.icon-button\.favorite\.active \.ui-icon\s*\{\s*fill:\s*currentColor;/u);
 });

@@ -1,6 +1,6 @@
 [package]
 name = "flow-notes"
-version = "1.0.0"
+version = "1.1.0"
 description = "Flow Notes"
 authors = ["Flow Notes"]
 edition = "2021"

@@ -317,13 +317,15 @@ body {
   display: flex;
   align-items: center;
   gap: 2px;
-  opacity: 0.8;
+  opacity: 0;
+  pointer-events: none;
   transition: opacity 120ms ease;
 }
 
 .note:hover .note-actions,
 .note:focus-within .note-actions {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .icon-button {
@@ -356,7 +358,7 @@ body {
 }
 
 .icon-button.favorite.active .ui-icon {
-  fill: var(--accent-soft);
+  fill: currentColor;
 }
 
 .icon-button.reminder.active:hover,
@@ -683,7 +685,6 @@ body {
 
   .note-actions {
     grid-column: 2;
-    opacity: 0.8;
     transform: none;
   }
 
@@ -691,6 +692,13 @@ body {
     padding: 14px 18px 20px;
   }
 
+}
+
+@media (hover: none), (pointer: coarse) {
+  .note-actions {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 @media (max-width: 520px) {

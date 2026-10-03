@@ -264,8 +264,9 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
       toggleReminderPicker(note);
     });
 
-    const favorite = createButton("", "icon-button favorite", "Favorite");
-    favorite.setAttribute("aria-label", "Favorite");
+    const favoriteTitle = note.favorite ? "Remove from favorites" : "Add to favorites";
+    const favorite = createButton("", "icon-button favorite", favoriteTitle);
+    favorite.setAttribute("aria-label", favoriteTitle);
     favorite.append(createIcon("star"));
     favorite.setAttribute("aria-pressed", String(note.favorite));
     favorite.classList.toggle("active", note.favorite);
