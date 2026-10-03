@@ -30,6 +30,7 @@ const DEFAULT_QUICK_CAPTURE_SHORTCUT: &str = "CommandOrControl+Shift+Space";
 const QUICK_CAPTURE_WINDOW: &str = "quick-capture";
 const SETTINGS_WINDOW: &str = "settings";
 const NOTES_CHANGED_EVENT: &str = "notes-changed";
+const NOTES_RELOADED_EVENT: &str = "notes-reloaded";
 const QUICK_CAPTURE_FOCUS_EVENT: &str = "quick-capture-focus";
 const NOTE_TEXT_SIZE_CHANGED_EVENT: &str = "note-text-size-changed";
 const LOGIN_LAUNCH_ARG: &str = "--login-launch";
@@ -1276,6 +1277,15 @@ fn hide_quick_capture(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn start_quick_capture_drag(window: tauri::WebviewWindow) -> Result<(), String> {
+    if window.label() != QUICK_CAPTURE_WINDOW {
+        return Err("Only Quick Capture can use this drag action".to_string());
+    }
+
+    window.start_dragging().map_err(|error| error.to_string())
+}
+
+#[tauri::command]
 fn get_settings(state: State<'_, AppState>) -> Result<AppSettings, String> {
     let db = state.db.lock().map_err(|error| error.to_string())?;
     read_settings(&db)
@@ -1512,7 +1522,11 @@ fn export_notes(state: State<'_, AppState>, path: Option<String>) -> Result<Expo
 }
 
 #[tauri::command]
-fn import_notes(state: State<'_, AppState>, path: Option<String>) -> Result<ImportResult, String> {
+fn import_notes(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    path: Option<String>,
+) -> Result<ImportResult, String> {
     let Some(path) = pick_import_path(path) else {
         return Ok(ImportResult {
             imported: false,
@@ -1521,8 +1535,12 @@ fn import_notes(state: State<'_, AppState>, path: Option<String>) -> Result<Impo
         });
     };
 
-    let mut db = state.db.lock().map_err(|error| error.to_string())?;
-    import_notes_from_path(&mut db, &path)
+    let result = {
+        let mut db = state.db.lock().map_err(|error| error.to_string())?;
+        import_notes_from_path(&mut db, &path)?
+    };
+    let _ = app.emit(NOTES_RELOADED_EVENT, ());
+    Ok(result)
 }
 
 #[tauri::command]
@@ -1623,6 +1641,7 @@ fn main() {
             is_launch_at_login_enabled,
             show_reminder_notification,
             hide_quick_capture,
+            start_quick_capture_drag,
             get_settings,
             set_launch_at_login,
             set_launch_behavior,

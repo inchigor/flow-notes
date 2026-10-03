@@ -1,66 +1,53 @@
-:root {
-  color-scheme: light;
-  --bg: #f6f7f4;
-  --ink: #1f2422;
-  --muted: #69706c;
-  --muted-soft: #8c928e;
-  --line: #dedfd8;
-  --accent: #287c6b;
-  --danger: #b43b45;
-  --focus-soft: rgba(40, 124, 107, 0.09);
-}
-
-* {
-  box-sizing: border-box;
-}
-
 html,
 body {
   height: 100%;
 }
 
 body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-button,
-input,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
+  overflow: hidden;
 }
 
 .settings-window {
+  position: relative;
   display: grid;
-  gap: 18px;
+  gap: 22px;
   height: 100%;
-  padding: 20px 22px 18px;
+  padding: 28px;
   overflow-y: auto;
+  background: var(--panel);
+  box-shadow: inset 0 1px 0 var(--glass-edge);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.settings-header > .ui-icon {
+  color: var(--accent);
 }
 
 .settings-header h1 {
   margin: 0;
-  font-size: 18px;
+  font-size: 21px;
   line-height: 1.2;
-  font-weight: 760;
+  font-weight: 600;
 }
 
 .settings-group {
   display: grid;
-  gap: 10px;
+  gap: 14px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line-soft);
 }
 
 .settings-group h2 {
   margin: 0 0 2px;
-  color: var(--muted);
+  color: var(--ink);
   font-size: 12px;
-  font-weight: 680;
+  font-weight: 600;
 }
 
 .settings-row {
@@ -74,17 +61,51 @@ button {
 }
 
 .settings-row input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent);
+  position: relative;
+  appearance: none;
+  flex: 0 0 auto;
+  width: 32px;
+  height: 19px;
+  margin: 0;
+  border: 1px solid #cad4ce;
+  border-radius: 99px;
+  background: #dce3df;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+
+.settings-row input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(25, 46, 35, 0.15);
+  transition: transform 140ms ease;
+}
+
+.settings-row input[type="checkbox"]:checked {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.settings-row input[type="checkbox"]:checked::before {
+  transform: translateX(13px);
+}
+
+.settings-row input[type="checkbox"]:disabled {
+  cursor: default;
+  opacity: 0.5;
 }
 
 .settings-fieldset {
   margin: 0;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.55);
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .settings-fieldset:disabled {
@@ -92,10 +113,10 @@ button {
 }
 
 .settings-fieldset legend {
-  padding: 0 4px;
+  padding: 0;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 680;
+  font-weight: 400;
 }
 
 .settings-fieldset:disabled legend {
@@ -120,6 +141,44 @@ button {
   accent-color: var(--accent);
 }
 
+.text-size-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.text-size-options legend {
+  margin-bottom: 10px;
+}
+
+.text-size-options .settings-choice {
+  justify-content: center;
+  margin: 0;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f9fbfa;
+  cursor: pointer;
+}
+
+.text-size-options .settings-choice:has(input:checked) {
+  border-color: #9cbcaf;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.text-size-options .settings-choice:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.text-size-options input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
 .settings-block {
   display: grid;
   gap: 7px;
@@ -133,21 +192,21 @@ button {
 .settings-block input[type="text"] {
   width: 100%;
   min-width: 0;
-  height: 34px;
+  height: 38px;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 0 10px;
-  background: rgba(255, 255, 255, 0.72);
+  background: #f9fbfa;
   color: var(--ink);
   outline: none;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
   font-size: 14px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 .settings-block input[type="text"][data-mode="display"] {
   font-size: 15px;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
 }
 
 .settings-block input[type="text"]:focus {
@@ -163,19 +222,23 @@ button {
 }
 
 .settings-actions {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .settings-button {
   display: flex;
   align-items: center;
-  width: 100%;
+  gap: 7px;
+  width: fit-content;
   height: 32px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 0 10px;
-  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 12px;
+  background: var(--glass);
+  box-shadow: inset 0 1px 0 var(--glass-edge);
   color: var(--muted);
   text-align: left;
   transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
@@ -183,14 +246,19 @@ button {
 
 .settings-button:hover,
 .settings-button:focus-visible {
-  border-color: rgba(222, 223, 216, 0.7);
-  background: rgba(255, 255, 255, 0.66);
+  border-color: #9cbcaf;
+  background: var(--accent-soft);
   color: var(--ink);
 }
 
 .settings-button:disabled {
   cursor: default;
   opacity: 0.58;
+}
+
+.settings-button .ui-icon {
+  width: 15px;
+  height: 15px;
 }
 
 .settings-status {

@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Settings</title>
+    <link rel="stylesheet" href="/theme.css">
     <link rel="stylesheet" href="/settings.css">
   </head>
   <body>
     <main class="settings-window">
       <header class="settings-header">
+        <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#settings"></use></svg>
         <h1>Settings</h1>
       </header>
 
@@ -46,7 +48,7 @@
             placeholder="⌘⇧Space"
             aria-describedby="shortcutHint"
           >
-          <p id="shortcutHint" class="settings-hint">Shown as symbols. Click to edit the technical shortcut.</p>
+          <p id="shortcutHint" class="sr-only">Shown as symbols. Click to edit the technical shortcut.</p>
           <div class="settings-actions">
             <button id="saveShortcut" class="settings-button" type="button">Save shortcut</button>
             <button id="resetShortcut" class="settings-button" type="button">Reset</button>
@@ -62,7 +64,7 @@
       <section class="settings-group" aria-label="Appearance">
         <h2>Appearance</h2>
 
-        <fieldset class="settings-fieldset">
+        <fieldset class="settings-fieldset text-size-options">
           <legend>Note text size</legend>
           <label class="settings-choice">
             <input type="radio" name="noteTextSize" value="small">
@@ -81,6 +83,17 @@
 
       <section class="settings-group" aria-label="Backup">
         <h2>Backup</h2>
+
+        <div class="settings-actions">
+          <button id="exportNotes" class="settings-button" type="button">
+            <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#download"></use></svg>
+            <span>Export Notes</span>
+          </button>
+          <button id="importNotes" class="settings-button" type="button">
+            <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#upload"></use></svg>
+            <span>Import Notes</span>
+          </button>
+        </div>
 
         <label class="settings-row">
           <span>Automatic backups</span>

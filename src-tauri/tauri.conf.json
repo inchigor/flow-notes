@@ -8,6 +8,7 @@
   },
   "app": {
     "withGlobalTauri": true,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
@@ -18,14 +19,19 @@
         "minHeight": 560,
         "resizable": true,
         "center": true,
-        "backgroundColor": "#f6f7f4"
+        "transparent": true,
+        "backgroundColor": "#00000000",
+        "windowEffects": {
+          "effects": ["sidebar"],
+          "state": "active"
+        }
       },
       {
         "label": "quick-capture",
         "title": "Quick Capture",
         "url": "quick-capture.html",
         "width": 520,
-        "height": 148,
+        "height": 220,
         "resizable": false,
         "decorations": false,
         "alwaysOnTop": true,
@@ -33,7 +39,13 @@
         "skipTaskbar": true,
         "center": true,
         "focus": false,
-        "backgroundColor": "#ffffff"
+        "transparent": true,
+        "backgroundColor": "#00000000",
+        "windowEffects": {
+          "effects": ["popover"],
+          "state": "active",
+          "radius": 14
+        }
       },
       {
         "label": "settings",
@@ -44,7 +56,12 @@
         "resizable": false,
         "visible": false,
         "center": true,
-        "backgroundColor": "#f6f7f4"
+        "transparent": true,
+        "backgroundColor": "#00000000",
+        "windowEffects": {
+          "effects": ["sidebar"],
+          "state": "active"
+        }
       }
     ],
     "security": {

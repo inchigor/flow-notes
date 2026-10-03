@@ -4,48 +4,68 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Flow Notes</title>
+    <link rel="stylesheet" href="/theme.css">
     <link rel="stylesheet" href="/style.css">
   </head>
   <body>
     <main class="app-shell">
-      <button class="sidebar-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar">☰</button>
+      <button class="sidebar-toggle" type="button" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle sidebar" title="Toggle sidebar">
+        <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#panel-left"></use></svg>
+      </button>
 
       <aside id="sidebar" class="sidebar">
         <header class="brand">
+          <img class="brand-icon" src="/flow-notes.png" width="32" height="32" alt="">
           <h1>Flow Notes</h1>
-          <p id="notesCount">0 notes</p>
         </header>
 
-        <nav class="sidebar-nav" aria-label="Notes">
-          <button class="nav-button active" type="button" data-view="all">All Notes</button>
-          <button class="nav-button" type="button" data-view="favorites">Favorites</button>
-        </nav>
-
         <section class="sidebar-search" aria-label="Search">
-          <label for="searchInput">Search</label>
-          <input id="searchInput" type="search" placeholder="Find notes">
+          <label class="sr-only" for="searchInput">Search</label>
+          <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#search"></use></svg>
+          <input id="searchInput" type="search" placeholder="Find a note...">
         </section>
 
-        <section class="backup-section" aria-label="Backup">
-          <h2>Backup</h2>
-          <button id="exportNotes" class="backup-button" type="button">Export Notes</button>
-          <button id="importNotes" class="backup-button" type="button">Import Notes</button>
-          <p id="backupStatus" class="backup-status" aria-live="polite"></p>
-        </section>
+        <nav class="sidebar-nav" aria-label="Notes">
+          <button class="nav-button active" type="button" data-view="all" aria-current="page">
+            <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#file-text"></use></svg>
+            <span>All Notes</span>
+          </button>
+          <button class="nav-button" type="button" data-view="favorites">
+            <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#star"></use></svg>
+            <span>Favorites</span>
+            <span id="favoritesCount" class="nav-count" aria-hidden="true">0</span>
+          </button>
+        </nav>
 
         <div class="sidebar-footer">
           <button id="openSettings" class="sidebar-settings-button" type="button" aria-label="Settings">
-            Settings
+            <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#settings"></use></svg>
+            <span>Settings</span>
           </button>
         </div>
       </aside>
 
       <section class="stream-panel">
+        <header class="stream-header">
+          <div class="stream-heading">
+            <h2 id="streamTitle">All Notes</h2>
+            <span id="notesCount" class="stream-count">0 notes</span>
+          </div>
+          <time id="streamDate" class="stream-date"></time>
+        </header>
         <section id="timeline" class="timeline" aria-live="polite"></section>
 
-        <form id="noteForm" class="composer">
-          <textarea id="noteInput" rows="1" placeholder="Write a note..."></textarea>
-        </form>
+        <div class="composer-region">
+          <form id="noteForm" class="composer">
+            <textarea id="noteInput" rows="1" placeholder="What's on your mind?" aria-label="Write a note"></textarea>
+            <div class="composer-footer">
+              <span id="composerWordCount" class="word-count">0 words</span>
+              <button id="saveNote" class="composer-save" type="submit" title="Save note" aria-label="Save note" disabled>
+                <svg class="ui-icon" aria-hidden="true"><use href="/icons.svg#arrow-up"></use></svg>
+              </button>
+            </div>
+          </form>
+        </div>
       </section>
     </main>
 

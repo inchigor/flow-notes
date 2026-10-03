@@ -9,6 +9,8 @@ const noteTextSizeInputs = document.querySelectorAll('input[name="noteTextSize"]
 const automaticBackupsInput = document.querySelector("#automaticBackups");
 const lastBackupLabel = document.querySelector("#lastBackupLabel");
 const openBackupFolderButton = document.querySelector("#openBackupFolder");
+const exportNotesButton = document.querySelector("#exportNotes");
+const importNotesButton = document.querySelector("#importNotes");
 const settingsStatus = document.querySelector("#settingsStatus");
 
 let settingsBusy = false;
@@ -71,6 +73,9 @@ function setSettingsBusy(isBusy) {
   if (openBackupFolderButton) {
     openBackupFolderButton.disabled = isBusy;
   }
+
+  exportNotesButton.disabled = isBusy;
+  importNotesButton.disabled = isBusy;
 
   updateLaunchBehaviorAvailability();
 }
@@ -452,7 +457,49 @@ async function handleOpenBackupFolder() {
   }
 }
 
+async function exportNotesBackup() {
+  if (settingsBusy) {
+    return;
+  }
+
+  setSettingsBusy(true);
+  setSettingsStatus("");
+
+  try {
+    const result = await invokeTauri("export_notes", { path: null });
+    setSettingsStatus(result.exported ? `Exported ${result.count} notes` : "Export cancelled");
+  } catch (error) {
+    console.error(error);
+    setSettingsStatus(error.message || "Export failed", { error: true });
+  } finally {
+    setSettingsBusy(false);
+  }
+}
+
+async function importNotesBackup() {
+  if (settingsBusy) {
+    return;
+  }
+
+  setSettingsBusy(true);
+  setSettingsStatus("");
+
+  try {
+    const result = await invokeTauri("import_notes", { path: null });
+    setSettingsStatus(
+      result.imported ? `Imported ${result.added}, skipped ${result.skipped}` : "Import cancelled",
+    );
+  } catch (error) {
+    console.error(error);
+    setSettingsStatus(error.message || "Import failed", { error: true });
+  } finally {
+    setSettingsBusy(false);
+  }
+}
+
 if (getTauriInvoke()) {
+  exportNotesButton.addEventListener("click", exportNotesBackup);
+  importNotesButton.addEventListener("click", importNotesBackup);
   launchAtLoginInput.addEventListener("change", handleLaunchAtLoginChange);
   launchBehaviorInputs.forEach((input) => {
     input.addEventListener("change", handleLaunchBehaviorChange);

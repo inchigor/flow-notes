@@ -5,10 +5,12 @@ const searchInput = document.querySelector("#searchInput");
 const notesCount = document.querySelector("#notesCount");
 const navButtons = document.querySelectorAll(".nav-button");
 const sidebarToggle = document.querySelector(".sidebar-toggle");
-const exportNotesButton = document.querySelector("#exportNotes");
-const importNotesButton = document.querySelector("#importNotes");
-const backupStatus = document.querySelector("#backupStatus");
 const openSettingsButton = document.querySelector("#openSettings");
+const streamTitle = document.querySelector("#streamTitle");
+const streamDate = document.querySelector("#streamDate");
+const favoritesCount = document.querySelector("#favoritesCount");
+const saveNoteButton = document.querySelector("#saveNote");
+const composerWordCount = document.querySelector("#composerWordCount");
 
 let notes = [];
 let inlineEditingId = null;
@@ -106,6 +108,10 @@ function autoGrowTextarea(textarea, maxHeight = 180) {
 
 function autoGrowInput() {
   autoGrowTextarea(noteInput, 180);
+  saveNoteButton.disabled = !noteInput.value.trim();
+  const text = noteInput.value.trim();
+  const count = text ? text.split(/\s+/u).length : 0;
+  composerWordCount.textContent = `${count} ${count === 1 ? "word" : "words"}`;
 }
 
 function getDraft() {
@@ -149,20 +155,16 @@ function createButton(label, className, title) {
   return button;
 }
 
-function createReminderIcon() {
+function createIcon(name) {
   const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  icon.setAttribute("class", "reminder-icon");
+  icon.setAttribute("class", "ui-icon");
   icon.setAttribute("viewBox", "0 0 24 24");
   icon.setAttribute("aria-hidden", "true");
   icon.setAttribute("focusable", "false");
 
-  const body = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  body.setAttribute("d", "M18 16v-5a6 6 0 0 0-12 0v5l-2 2h16l-2-2Z");
-
-  const clapper = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  clapper.setAttribute("d", "M9.5 20a2.7 2.7 0 0 0 5 0");
-
-  icon.append(body, clapper);
+  const symbol = document.createElementNS("http://www.w3.org/2000/svg", "use");
+  symbol.setAttribute("href", `/icons.svg#${name}`);
+  icon.append(symbol);
   return icon;
 }
 
@@ -184,23 +186,42 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
 
   timeline.replaceChildren();
   notesCount.textContent = `${visibleNotes.length} ${getPlural(visibleNotes.length)}`;
+  favoritesCount.textContent = notes.filter((note) => note.favorite).length;
+  streamTitle.textContent = searchInput.value.trim()
+    ? "Search results"
+    : currentView === "favorites" ? "Favorites" : "All Notes";
+  const today = new Date();
+  streamDate.dateTime = today.toISOString();
+  streamDate.textContent = new Intl.DateTimeFormat("en-GB", {
+    weekday: "short", day: "numeric", month: "long",
+  }).format(today);
 
   if (visibleNotes.length === 0) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
 
     if (notes.length === 0) {
+      const mark = document.createElement("img");
+      mark.className = "empty-mark";
+      mark.src = "/flow-notes.png";
+      mark.alt = "";
+      mark.width = 48;
+      mark.height = 48;
+
       const title = document.createElement("p");
       title.className = "empty-title";
-      title.textContent = "No notes yet";
+      title.textContent = "A fresh page.";
 
       const subtitle = document.createElement("p");
       subtitle.className = "empty-subtitle";
-      subtitle.textContent = "Start typing below";
+      subtitle.textContent = "Room for whatever is on your mind.";
 
-      empty.append(title, subtitle);
+      empty.append(mark, title, subtitle);
     } else {
-      empty.textContent = "No notes found";
+      const title = document.createElement("p");
+      title.className = "empty-title";
+      title.textContent = searchInput.value.trim() ? "No notes found." : "No favorites yet.";
+      empty.append(createIcon(searchInput.value.trim() ? "search" : "star"), title);
     }
 
     timeline.append(empty);
@@ -234,16 +255,19 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
 
     const reminder = createButton("", "icon-button reminder", "Reminder");
     reminder.setAttribute("aria-label", "Reminder");
-    reminder.append(createReminderIcon());
+    reminder.append(createIcon("bell"));
     reminder.classList.toggle("active", Boolean(note.remind_at));
+    reminder.setAttribute("aria-expanded", String(reminderEditingId === note.id));
     reminder.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       toggleReminderPicker(note);
     });
 
-    const favorite = createButton(note.favorite ? "★" : "☆", "icon-button", "Favorite");
+    const favorite = createButton("", "icon-button favorite", "Favorite");
     favorite.setAttribute("aria-label", "Favorite");
+    favorite.append(createIcon("star"));
+    favorite.setAttribute("aria-pressed", String(note.favorite));
     favorite.classList.toggle("active", note.favorite);
     favorite.addEventListener("click", (event) => {
       event.preventDefault();
@@ -251,16 +275,18 @@ function renderNotes({ scrollMode = "preserve", smooth = false } = {}) {
       toggleFavorite(note);
     });
 
-    const edit = createButton("✎", "icon-button", "Edit");
+    const edit = createButton("", "icon-button", "Edit");
     edit.setAttribute("aria-label", "Edit");
+    edit.append(createIcon("pencil"));
     edit.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
       startInlineEdit(note);
     });
 
-    const remove = createButton("×", "icon-button danger", "Delete");
+    const remove = createButton("", "icon-button danger", "Delete");
     remove.setAttribute("aria-label", "Delete");
+    remove.append(createIcon("x"));
     remove.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -319,6 +345,7 @@ function createNoteText(note) {
 
   const editor = document.createElement("textarea");
   editor.className = "inline-editor";
+  editor.setAttribute("aria-label", "Edit note");
   editor.value = note.text;
   editor.rows = 1;
   editor.addEventListener("input", () => autoGrowTextarea(editor, 260));
@@ -368,6 +395,7 @@ function createReminderPicker(note) {
   const input = document.createElement("input");
   input.className = "reminder-input";
   input.type = "datetime-local";
+  input.setAttribute("aria-label", "Reminder date and time");
   input.value = toDatetimeLocalValue(note.remind_at);
 
   const set = createButton("Set", "reminder-action primary", "Set reminder");
@@ -482,20 +510,6 @@ function upsertNote(note) {
   }
 }
 
-function setBackupStatus(message, { error = false } = {}) {
-  if (!backupStatus) {
-    return;
-  }
-
-  backupStatus.textContent = message;
-  backupStatus.classList.toggle("error", error);
-}
-
-function setBackupBusy(isBusy) {
-  exportNotesButton.disabled = isBusy;
-  importNotesButton.disabled = isBusy;
-}
-
 async function invokeTauri(command, args = {}) {
   const invoke = getTauriInvoke();
 
@@ -527,52 +541,6 @@ async function updateNote(id, patch) {
 
 async function deleteNote(id) {
   await invokeTauri("delete_note", { id });
-}
-
-async function exportNotesBackup() {
-  try {
-    setBackupBusy(true);
-    setBackupStatus("");
-
-    const result = await invokeTauri("export_notes", { path: null });
-
-    if (!result.exported) {
-      setBackupStatus("Export cancelled");
-      return;
-    }
-
-    setBackupStatus(`Exported ${result.count} notes`);
-  } catch (error) {
-    console.error(error);
-    setBackupStatus("Export failed", { error: true });
-  } finally {
-    setBackupBusy(false);
-    requestAnimationFrame(() => focusComposer());
-  }
-}
-
-async function importNotesBackup() {
-  try {
-    setBackupBusy(true);
-    setBackupStatus("");
-
-    const result = await invokeTauri("import_notes", { path: null });
-
-    if (!result.imported) {
-      setBackupStatus("Import cancelled");
-      return;
-    }
-
-    notes = await getNotes();
-    renderNotes({ scrollMode: "always", smooth: true });
-    setBackupStatus(`Imported ${result.added}, skipped ${result.skipped}`);
-  } catch (error) {
-    console.error(error);
-    setBackupStatus(error.message || "Import failed", { error: true });
-  } finally {
-    setBackupBusy(false);
-    requestAnimationFrame(() => focusComposer());
-  }
 }
 
 async function loadNotes() {
@@ -692,8 +660,6 @@ async function removeNote(note) {
 
 noteForm.addEventListener("submit", saveNote);
 searchInput.addEventListener("input", () => renderNotes({ scrollMode: "if-bottom" }));
-exportNotesButton.addEventListener("click", exportNotesBackup);
-importNotesButton.addEventListener("click", importNotesBackup);
 sidebarToggle.addEventListener("click", () => {
   const isOpen = document.body.classList.toggle("sidebar-open");
   sidebarToggle.setAttribute("aria-expanded", String(isOpen));
@@ -702,7 +668,14 @@ sidebarToggle.addEventListener("click", () => {
 navButtons.forEach((button) => {
   button.addEventListener("click", () => {
     currentView = button.dataset.view;
-    navButtons.forEach((item) => item.classList.toggle("active", item === button));
+    navButtons.forEach((item) => {
+      item.classList.toggle("active", item === button);
+      if (item === button) {
+        item.setAttribute("aria-current", "page");
+      } else {
+        item.removeAttribute("aria-current");
+      }
+    });
     document.body.classList.remove("sidebar-open");
     sidebarToggle.setAttribute("aria-expanded", "false");
     renderNotes({ scrollMode: "if-bottom" });
@@ -804,5 +777,14 @@ async function setupNotesChangedListener() {
     upsertNote(note);
 
     renderNotes({ scrollMode: "if-bottom", smooth: true });
+  });
+
+  await listen("notes-reloaded", () => {
+    getNotes().then((result) => {
+      notes = result;
+      renderNotes({ scrollMode: "if-bottom", smooth: true });
+    }).catch((error) => {
+      console.error(error);
+    });
   });
 }

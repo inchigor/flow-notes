@@ -9,10 +9,10 @@ analytics, telemetry, or updater configured in the current application code.
 
 - Fast note capture and chronological note stream
 - Search, favorites, inline editing, and deletion
-- Quick Capture window with a configurable global shortcut
+- Draggable Quick Capture window with a configurable global shortcut
 - Reminders with native notifications
 - Tray menu, background mode, and launch-at-login setting
-- JSON import and export
+- JSON import and export from Settings
 - Automatic local backups
 - Settings for launch behavior, Quick Capture, note text size, and backups
 - Local SQLite storage
@@ -70,6 +70,18 @@ The macOS app bundle is created under
 Flow Notes stores its SQLite database in its macOS application-data location.
 Automatic backups are written locally alongside app data. Notes can also be
 exported to and imported from JSON files through the app.
+
+## Tests
+
+Run the frontend interaction checks with Node.js 18 or later and the Rust
+backend tests:
+
+```sh
+node --test tests/frontend.test.cjs
+cargo test --manifest-path src-tauri/Cargo.toml --locked
+```
+
+The frontend checks use a mock Tauri bridge and do not access app data.
 
 ## License
 
